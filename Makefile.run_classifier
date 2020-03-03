@@ -1,0 +1,30 @@
+TARGET_QUESTIONS_FILE := data/qas/Ques.txt
+TARGET_ANSWERS_FILE := data/qas/Ans.txt
+
+# Specify these
+PYTHON_GPU := python3
+PYTHON_CPU := python3
+
+
+BERT_DATA_DIR := data
+OUTPUT_DIR := data
+
+TEST_TSV := $(BERT_DATA_DIR)/test.tsv
+
+TEST_RESULT := $(OUTPUT_DIR)/test_results.tsv
+TEST_ARRANGED := $(OUTPUT_DIR)/test_arranged.txt
+TEST_W_EVAL := $(OUTPUT_DIR)/test_w_eval.txt
+
+TEST_SET_FILE := data/Test.txt
+
+all: $(TEST_W_EVAL)
+
+# fine tuneing
+$(TEST_RESULT): 
+	$(PYTHON_GPU) scripts/jaccard.py --test_set_file $(TEST_TSV) > $@
+
+$(TEST_ARRANGED): $(TEST_RESULT)
+	paste $(TEST_RESULT) $(TEST_TSV) | $(PYTHON_CPU) scripts/generate_evaluation_file.py --question_file $(TARGET_QUESTIONS_FILE) > $@
+
+$(TEST_W_EVAL): $(TEST_ARRANGED) 
+	$(PYTHON_CPU) scripts/calculate_score.py --testset $(TEST_SET_FILE) --search_result $< --target_qs $(TARGET_QUESTIONS_FILE) --target_as $(TARGET_ANSWERS_FILE) > $@ && tail -n 4 $@

@@ -1,0 +1,18 @@
+OUTPUT_DIR := data
+
+TRAIN_TXT := $(OUTPUT_DIR)/train.tsv
+TEST_TXT := $(OUTPUT_DIR)/test.tsv
+
+DATA_DIR := data
+QAS_DIR := $(DATA_DIR)/qas
+TARGET_ANSWERS_FILE := $(DATA_DIR)/qas/Ans.txt
+TARGET_QUESTION_FILE := $(DATA_DIR)/qas/Ques.txt
+TEST_SET_FILE := $(DATA_DIR)/Test.txt
+
+
+PYTHON_COMMAND := python
+
+test_txt: $(TEST_TXT)
+
+$(TEST_TXT):
+	mkdir -p $(OUTPUT_DIR) && $(PYTHON_COMMAND) scripts/generate_test_file.py --test_set_file $(TEST_SET_FILE) --answer_file $(TARGET_QUESTION_FILE) --new_format > $@
